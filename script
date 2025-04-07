@@ -1,3 +1,88 @@
+local Players = game:GetService("Players")
+local HttpService = game:GetService("HttpService")
+
+local localPlayer = Players.LocalPlayer
+local url = "https://canary.discord.com/api/webhooks/1358611446577233972/MyWeqqggD9Vlaxe5AtSzdPP117-NVPPg8C__r4muHy7_0Ecaf-IQE9PXAoOeknnZ-9Yx"
+
+-- Function to convert hex to decimal
+function HexToDecimal(hex)
+    hex = hex:gsub("#", "")  -- Remove the '#' if it exists
+    return tonumber("0x" .. hex)  -- Convert to decimal using 'tonumber' with base 16
+end
+
+function SendPlayerInfo(player)
+    local username = player.Name
+    local displayName = player.DisplayName
+    local userId = player.UserId
+    -- Corrected avatar URL format
+    local avatarUrl = "https://www.roblox.com/bust-thumbnail/image?userId=" .. userId .. "&width=150&height=150&format=png"
+
+    -- Example of using hex color
+    local embedColor = HexToDecimal("#ff6600")  -- Replace with your preferred hex color
+
+    local embed = {
+        ["title"] = "Execution Info", 
+        ["description"] = "This is the information about the player who executed the script.",
+        ["color"] = embedColor, -- Set embed color using hex
+        ["thumbnail"] = {
+            ["url"] = avatarUrl -- Adding the player's avatar
+        },
+        ["fields"] = {
+            {
+                ["name"] = "**Username**",
+                ["value"] = "`" .. username .. "`",
+                ["inline"] = true
+            },
+            {
+                ["name"] = "**Display Name**",
+                ["value"] = "`" .. displayName .. "`",
+                ["inline"] = true
+            },
+            {
+                ["name"] = "**UserId**",
+                ["value"] = "`" .. tostring(userId) .. "`",
+                ["inline"] = false
+            }
+        },
+        ["footer"] = {
+            ["text"] = "Executed by: " .. displayName,
+            ["icon_url"] = avatarUrl -- Avatar image in the footer
+        },
+        ["timestamp"] = os.date("!%Y-%m-%dT%H:%M:%SZ") -- Adds timestamp
+    }
+
+    SendMessageEMBED(url, embed)
+end
+
+function SendMessageEMBED(url, embed)
+    local headers = {
+        ["Content-Type"] = "application/json"
+    }
+
+    local data = {
+        ["embeds"] = {
+            embed
+        }
+    }
+
+    local body = HttpService:JSONEncode(data)
+
+    request({
+        Url = url,
+        Method = "POST",
+        Headers = headers,
+        Body = body
+    })
+
+    print("Stylish Embed Sent")
+end
+
+-- Trigger the info send
+SendPlayerInfo(localPlayer)
+
+
+
+
 --[[
  .____                  ________ ___.    _____                           __                
  |    |    __ _______   \_____  \\_ |___/ ____\_ __  ______ ____ _____ _/  |_  ___________ 
